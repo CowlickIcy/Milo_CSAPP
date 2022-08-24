@@ -1,0 +1,14 @@
+{
+    "files.associations": {
+        "stdio.h": "c",
+        "dram.h": "c"
+    },
+    "[c]": {
+        "editor.quickSuggestions": {
+            "other": "on",
+            "comments": "on",
+            "strings": "on"
+        }
+    },
+    "C_Cpp.errorSquiggles": "Disabled"
+}
