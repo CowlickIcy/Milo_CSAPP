@@ -1,3 +1,6 @@
+#ifndef REGISTER_H
+#define REGISTER_H
+
 #include <stdlib.h>
 #include <stdint.h>
 
@@ -29,3 +32,5 @@ typedef struct CPU_STRUCT
 } reg_t;
 
 reg_t reg;
+
+#endif

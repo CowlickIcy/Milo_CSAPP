@@ -3,12 +3,13 @@
 
 #include "memory/instruction.h"
 #include "cpu/register.h"
+#include "disk/elf.h"
 
 inst_t program[15] = {
     // uint64_t add(uint64_t, uint64_t)
     {
         push_reg,
-        {REG, 0, 0, (uint64_t *)reg.rbp, NULL},
+        {REG, 0, 0, (uint64_t *)&reg.rbp, NULL},
         {EMPTY, 0, 0, NULL, NULL},
         "push   \%rbp"
     },

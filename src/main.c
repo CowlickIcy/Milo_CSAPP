@@ -1,6 +1,12 @@
 #include <stdio.h>
+
 #include "cpu/register.h"
+#include "cpu/mmu.h"
+
 #include "memory/instruction.h"
+#include "memory/dram.h"
+
+#include "disk/elf.h"
 
 int main()
 {
@@ -19,19 +25,30 @@ int main()
     reg.rip = (uint64_t)&program[11];
 
     // inti memory
-    mm[va2pa(0x7fffffffdd30)] = 0x00007ffff7ffc620; // rbp
-    mm[va2pa(0x7fffffffdd2f)] = 0x00007ffff7df1083;
-    mm[va2pa(0x7fffffffdd20)] = 0x00000000;
-    mm[va2pa(0x7fffffffdd1f)] = 0x12340000;
-    mm[va2pa(0x7fffffffdd10)] = 0x0000abcd; // rsp
+
+    write64bits_dram(va2pa(0x7fffffffdd30), 0x00007ffff7ffc620); // rbp
+    write64bits_dram(va2pa(0x7fffffffdd28), 0x00007ffff7df1083);
+    write64bits_dram(va2pa(0x7fffffffdd20), 0x00000000);
+    write64bits_dram(va2pa(0x7fffffffdd18), 0x12340000);
+    write64bits_dram(va2pa(0x7fffffffdd10), 0x0000abcd); // rsp
+
+    // printf("%16lx\n", read64bits_dram(va2pa(0x7fffffffdd30)));
+    // uint64_t pa = va2pa(0x7fffffffdd30);
+    // printf("%16lx\n", *((uint64_t *)(&mm[pa])));
+
+    // mm[va2pa(0x7fffffffdd30)] = 0x00007ffff7ffc620; // rbp
+    // mm[va2pa(0x7fffffffdd28)] = 0x00007ffff7df1083;
+    // mm[va2pa(0x7fffffffdd20)] = 0x00000000;
+    // mm[va2pa(0x7fffffffdd18)] = 0x12340000;
+    // mm[va2pa(0x7fffffffdd10)] = 0x0000abcd; // rsp
 
     // run instruction
 
     for (int i = 0; i < 15; ++i)
     {
-        instruction_cycle();
+        // instruction_cycle();
     }
-    
+
     // verify
 
     int match = 1;
@@ -54,11 +71,11 @@ int main()
     }
 
     match = 1;
-    match = match && (mm[va2pa(0x7fffffffdd30)] == 0x00007ffff7ffc620); // rbp
-    match = match && (mm[va2pa(0x7fffffffdd2f)] == 0x00007ffff7df1083);
-    match = match && (mm[va2pa(0x7fffffffdd20)] == 0x00000000);
-    match = match && (mm[va2pa(0x7fffffffdd1f)] == 0x0000abcd);
-    match = match && (mm[va2pa(0x7fffffffdd10)] == 0x0000abcd); // rsp
+    match = match && (read64bits_dram(va2pa(0x7fffffffdd30)) == 0x00007ffff7ffc620); // rbp
+    match = match && (read64bits_dram(va2pa(0x7fffffffdd28)) == 0x00007ffff7df1083);
+    match = match && (read64bits_dram(va2pa(0x7fffffffdd20)) == 0x00000000);
+    match = match && (read64bits_dram(va2pa(0x7fffffffdd18)) == 0x0000abcd);
+    match = match && (read64bits_dram(va2pa(0x7fffffffdd10)) == 0x0000abcd); // rsp
 
     if (match == 1)
     {
