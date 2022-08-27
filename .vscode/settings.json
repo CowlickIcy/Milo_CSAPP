@@ -1,7 +1,8 @@
 {
     "files.associations": {
         "stdio.h": "c",
-        "dram.h": "c"
+        "dram.h": "c",
+        "mmu.h": "c"
     },
     "[c]": {
         "editor.quickSuggestions": {

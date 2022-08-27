@@ -1,6 +1,9 @@
+#include <stdio.h>
+
 #include "memory/instruction.h"
 #include "cpu/mmu.h"
 #include "cpu/register.h"
+#include "memory/dram.h"
 
 static uint64_t decode_od(od_t od)
 {
@@ -39,7 +42,7 @@ static uint64_t decode_od(od_t od)
         }
         else if (od.type == MM_REG2_SCAL)
         {
-            vaddr = *(od.reg2) * od.scal; // case 6
+            vaddr = *(od.reg2) * od.scal; // case 6`
         }
         else if (od.type == MM_IMM_REG2_SCAL)
         {
@@ -69,12 +72,16 @@ void instruction_cycle()
 
     // add_reg_reg_handler(src = &rax, dst = &rbx)
     handler(src, dst);
+
+    printf("    %s\n", instr->code);
 }
 
 // function table
-void init_handler_table(){
+void init_handler_table()
+{
     handler_table[mov_reg_reg] = &mov_reg_reg_handler;
     handler_table[add_reg_reg] = &add_reg_reg_handler;
+    handler_table[call] = &call_handler;
 }
 
 void mov_reg_reg_handler(uint64_t src, uint64_t dst)
@@ -87,4 +94,14 @@ void add_reg_reg_handler(uint64_t src, uint64_t dst)
 {
     *(uint64_t *)dst = *(uint64_t *)dst + *(uint64_t *)src;
     reg.rip = reg.rip + sizeof(inst_t);
+}
+
+void call_handler(uint64_t src, uint64_t dst)
+{
+    // src : imm address of called function
+    // 1. rsp -= 8
+    // 2. wirte return address to rsp memory and goto next instrcution
+    reg.rsp -= 8;
+    write64bits_dram(va2pa(reg.rsp), reg.rip + sizeof(inst_t));
+    reg.rip = src;
 }

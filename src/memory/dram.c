@@ -1,6 +1,9 @@
+#include <stdio.h>
 #include "memory/dram.h"
+#include "cpu/register.h"
+#include "cpu/mmu.h"
 
-#define SRAM_CACHE_SETTING 1
+#define SRAM_CACHE_SETTING 0 // 0 mains open read&write
 
 uint64_t read64bits_dram(uint64_t paddr)
 {
@@ -17,7 +20,7 @@ uint64_t read64bits_dram(uint64_t paddr)
     // 0x88** **** **** ****
     for (int i = 0; i < 8; ++i)
     {
-        val += (((uint64_t)mm[paddr + i]) << 8 * i);
+        val += (((uint64_t)mm[paddr + i]) << (8 * i));
     }
     return 0x0;
 }
@@ -34,16 +37,40 @@ void write64bits_dram(uint64_t paddr, uint64_t data)
     // 0x88** **** **** ****
     for (int i = 0; i < 8; ++i)
     {
-        mm[paddr + i] = (data >> 8 * i) & 0xff;
+        mm[paddr + i] = (data >> (8 * i)) & 0xff;
     }
 }
 
 void print_register()
 {
+    printf("rax = %16lx\trbx = %16lx\trcx = %16lx\trdx = %16lx\n",
+           reg.rax, reg.rbx, reg.rcx, reg.rdx);
+    printf("rsi = %16lx\trdi = %16lx\trbp = %16lx\trsp = %16lx\n",
+           reg.rsi, reg.rdi, reg.rbp, reg.rsp);
+    printf("rip = %16lx\n", reg.rip);
     return;
 }
 
 void print_stack()
 {
+    int curr = 10;
+    uint64_t *high = (uint64_t *)&mm[va2pa(reg.rsp)];
+    high = &high[curr];
+
+    uint64_t rsp_start = reg.rsp + curr * 8;
+    for (int i = 0; i < curr * 2; ++i)
+    {
+        uint64_t *curr_ptr = (uint64_t *)(high - i);
+        printf("0x%16lx : %16lx", rsp_start, (uint64_t)*curr_ptr);
+
+        if (i == curr)
+        {
+            printf(" <== rsp");
+        }
+
+        rsp_start -= 8;
+
+        printf("\n");
+    }
     return;
 }
