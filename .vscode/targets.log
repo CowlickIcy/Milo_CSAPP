@@ -8,7 +8,7 @@ make: *** No rule to make target 'all'.  Stop.
 # This is free software: you are free to change and redistribute it.
 # There is NO WARRANTY, to the extent permitted by law.
 
-# Make data base, printed on Fri Aug 26 20:34:00 2022
+# Make data base, printed on Mon Aug 29 11:32:38 2022
 
 # Variables
 
@@ -26,8 +26,6 @@ SRC = ./src
 ?D = $(patsubst %/,%,$(dir $?))
 # automatic
 @D = $(patsubst %/,%,$(dir $@))
-# makefile (from 'Makefile', line 4)
-EXE = program
 # automatic
 @F = $(notdir $@)
 # makefile
@@ -101,7 +99,7 @@ MAKE_VERSION := 4.2.1
 # environment
 USER = milomeng
 # makefile
-.DEFAULT_GOAL := main
+.DEFAULT_GOAL := csapp
 # environment
 NAME = VG1MXL
 # automatic
@@ -130,6 +128,8 @@ VSCODE_HANDLES_SIGPIPE = true
 MAKEFILES := 
 # automatic
 <F = $(notdir $<)
+# makefile (from 'Makefile', line 4)
+EXECUTABLE = csapp
 # environment
 LC_ALL = C
 # environment
@@ -157,21 +157,15 @@ WSL_DISTRO_NAME = Ubuntu-20.04
 
 # Directories
 
-# . (device 49, inode 5910974510939653): 11 files, no impossibilities.
+# . (device 49, inode 5910974510939653): 10 files, no impossibilities.
 
-# 11 files, no impossibilities in 1 directories.
+# 10 files, no impossibilities in 1 directories.
 
 # Implicit Rules
 
 # No implicit rules.
 
 # Files
-
-program:
-#  Phony target (prerequisite of .PHONY).
-#  Implicit rule search has not been done.
-#  File does not exist.
-#  File has not been updated.
 
 # Not a target:
 all:
@@ -180,7 +174,7 @@ all:
 #  File does not exist.
 #  File has not been updated.
 
-.PHONY: program
+.PHONY: csapp
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
@@ -188,9 +182,17 @@ all:
 # Not a target:
 Makefile:
 #  Implicit rule search has been done.
-#  Last modified 2022-08-23 20:17:42.0992946
+#  Last modified 2022-08-27 16:21:05.5546134
 #  File has been updated.
 #  Successfully updated.
+
+csapp:
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+#  recipe to execute (from 'Makefile', line 13):
+	$(CC) $(CFLAGS) -I$(SRC) $(CODE) -o $(EXECUTABLE)
 
 # Not a target:
 .DEFAULT:
@@ -202,30 +204,30 @@ run:
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
-#  recipe to execute (from 'Makefile', line 16):
-	./$(EXE)
+#  recipe to execute (from 'Makefile', line 18):
+	./$(EXECUTABLE)
 
-main:
+clean:
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
-#  recipe to execute (from 'Makefile', line 13):
-	$(CC) $(CFLAGS) -I$(SRC) $(CODE) -o $(EXE)
+#  recipe to execute (from 'Makefile', line 16):
+	rm -f *.o *~$(EXECUTABLE)
 
 # files hash-table stats:
-# Load=8/1024=1%, Rehash=0, Collisions=0/19=0%
+# Load=8/1024=1%, Rehash=0, Collisions=0/20=0%
 # VPATH Search Paths
 
 # No 'vpath' search paths.
 
 # No general ('VPATH' variable) search path.
 
-# strcache buffers: 1 (0) / strings = 19 / storage = 136 B / avg = 7 B
-# current buf: size = 8162 B / used = 136 B / count = 19 / avg = 7 B
+# strcache buffers: 1 (0) / strings = 18 / storage = 127 B / avg = 7 B
+# current buf: size = 8162 B / used = 127 B / count = 18 / avg = 7 B
 
-# strcache performance: lookups = 27 / hit rate = 29%
+# strcache performance: lookups = 28 / hit rate = 35%
 # hash-table stats:
-# Load=19/8192=0%, Rehash=0, Collisions=1/27=4%
-# Finished Make data base on Fri Aug 26 20:34:00 2022
+# Load=18/8192=0%, Rehash=0, Collisions=1/28=4%
+# Finished Make data base on Mon Aug 29 11:32:38 2022
 
  

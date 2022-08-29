@@ -1,5 +1,5 @@
-make --dry-run --always-make --keep-going --print-directory
+make --dry-run --keep-going --print-directory
 make: Entering directory '/mnt/e/wsl-Ubuntu/Milo_CSAPP'
-/usr/bin/gcc-9 -Wall -g -O2 -Werror -std=gnu99 -I./src ./src/memory/instruction.c ./src/disk/code.c ./src/memory/dram.c ./src/cpu/mmu.c ./src/main.c -o program
+/usr/bin/gcc-9 -Wall -g -O2 -Werror -std=gnu99 -I./src ./src/memory/instruction.c ./src/disk/code.c ./src/memory/dram.c ./src/cpu/mmu.c ./src/main.c -o csapp
 make: Leaving directory '/mnt/e/wsl-Ubuntu/Milo_CSAPP'
  

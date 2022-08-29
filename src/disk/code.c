@@ -8,24 +8,28 @@
 inst_t program[15] = {
     // uint64_t add(uint64_t, uint64_t)
     {
+        // 3
         push_reg,
         {REG, 0, 0, (uint64_t *)&reg.rbp, NULL},
         {EMPTY, 0, 0, NULL, NULL},
         "push   \%rbp"
     },
-    {
+    {   
+        // 4
         mov_reg_reg,
-        {REG, 0, 0, &reg.rdx, NULL},
-        {REG, 0, 0, &reg.rsi, NULL},
+        {REG, 0, 0, &reg.rsp, NULL},
+        {REG, 0, 0, &reg.rbp, NULL},
         "mov    \%rsp,\%rbp"
     },
     {
+        // 5
         mov_reg_mem,
         {REG, 0, 0, (uint64_t *)&reg.rdi, NULL},
         {MM_IMM_REG, -0x18, 0, (uint64_t *)&reg.rbp, NULL},
         "mov    \%rdi,0x18(\%rbp)"   
     },
     {
+        // 6
         mov_reg_mem,
         {REG, 0, 0, (uint64_t *)&reg.rsi, NULL},
         {MM_IMM_REG, -0x20, 0, (uint64_t *)&reg.rbp, NULL},
@@ -74,19 +78,22 @@ inst_t program[15] = {
         "retq"
     },
     // main entry point
-    {
+    {   
+        // 0
         mov_reg_reg,
         {REG, 0, 0, &reg.rdx, NULL},
         {REG, 0, 0, &reg.rsi, NULL},
         "mov    \%rdx,\%rsi"
     },
     {
+        // 1
         mov_reg_reg,
         {REG, 0, 0, (uint64_t *)&reg.rax, NULL},
         {REG, 0, 0, (uint64_t *)&reg.rdi, NULL},
         "mov    \%rax,\%rdi"
     },
-    {
+    {   
+        // 2
         call,
         {IMM, (uint64_t)&(program[0]), 0, NULL, NULL},
         {EMPTY, 0, 0, NULL, NULL},

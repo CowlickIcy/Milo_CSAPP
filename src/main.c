@@ -25,12 +25,13 @@ int main()
     reg.rip = (uint64_t)&program[11];
 
     // inti memory
-    write64bits_dram(va2pa(0x7fffffffdd30), 0x8000660); // rbp
-    write64bits_dram(va2pa(0x7fffffffdd28), 0x0);
-    write64bits_dram(va2pa(0x7fffffffdd20), 0xabcd);
-    write64bits_dram(va2pa(0x7fffffffdd18), 0x12340000);
-    write64bits_dram(va2pa(0x7fffffffdd10), 0x8000660); // rsp
+    write64bits_dram(va2pa(0x7ffffffee210), 0x8000660); // rbp
+    write64bits_dram(va2pa(0x7ffffffee208), 0x0);
+    write64bits_dram(va2pa(0x7ffffffee200), 0xabcd);
+    write64bits_dram(va2pa(0x7ffffffee1f8), 0x12340000);
+    write64bits_dram(va2pa(0x7ffffffee1f0), 0x8000660); // rsp
 
+    printf("Init register and stack.\n");
     print_register();
     print_stack();
     // printf("%16lx\n", read64bits_dram(va2pa(0x7fffffffdd30)));
@@ -38,15 +39,16 @@ int main()
     // printf("%16lx\n", *((uint64_t *)(&mm[pa])));
 
     // mm[va2pa(0x7fffffffdd30)] = 0x00007ffff7ffc6120; // rbp
-    // mm[va2pa(0x7fffffffdd28)] = 0x00007ffff7df1083;
+    // mm[va2pa(0x7fff  ffffdd28)] = 0x00007ffff7df1083;
     // mm[va2pa(0x7fffffffdd20)] = 0x00000000;
     // mm[va2pa(0x7fffffffdd18)] = 0x12340000;
     // mm[va2pa(0x7fffffffdd10)] = 0x0000abcd; // rsp
 
     // run instruction
 
-    for (int i = 0; i < 3; ++i)
+    for (int i = 0; i < 7; ++i)
     {
+        printf("No.%x instruction\n", i);
         instruction_cycle();
 
         print_register();
@@ -75,11 +77,11 @@ int main()
     }
 
     match = 1;
-    match = match && (read64bits_dram(va2pa(0x7fffffffdd30)) == 0x8000660); // rbp
-    match = match && (read64bits_dram(va2pa(0x7fffffffdd28)) == 0x0);
-    match = match && (read64bits_dram(va2pa(0x7fffffffdd20)) == 0xabcd);
-    match = match && (read64bits_dram(va2pa(0x7fffffffdd18)) == 0x12340000);
-    match = match && (read64bits_dram(va2pa(0x7fffffffdd10)) == 0x8000660); // rsp
+    match = match && (read64bits_dram(va2pa(0x7ffffffee210)) == 0x8000660); // rbp
+    match = match && (read64bits_dram(va2pa(0x7ffffffee208)) == 0x0);
+    match = match && (read64bits_dram(va2pa(0x7ffffffee200)) == 0xabcd);
+    match = match && (read64bits_dram(va2pa(0x7ffffffee1f8)) == 0x12340000);
+    match = match && (read64bits_dram(va2pa(0x7ffffffee1f0)) == 0x8000660); // rsp
 
     if (match == 1)
     {
