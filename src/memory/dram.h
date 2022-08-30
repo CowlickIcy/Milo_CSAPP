@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-#define MM_LEM 1024
+#define MM_LEM 1000
 
 // physical memory
 uint8_t mm[MM_LEM];     

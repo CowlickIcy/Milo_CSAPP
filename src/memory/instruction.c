@@ -82,9 +82,11 @@ void init_handler_table()
     handler_table[mov_reg_reg] = &mov_reg_reg_handler;
     handler_table[add_reg_reg] = &add_reg_reg_handler;
     handler_table[call] = &call_handler;
+    handler_table[ret] = &ret_handler;
     handler_table[push_reg] = &push_reg_handler;
     handler_table[pop_reg] = &pop_reg_handler;
     handler_table[mov_reg_mem] = &mov_reg_mem_handler;
+    handler_table[mov_mem_reg] = &mov_mem_reg_handler;
 }
 
 void mov_reg_reg_handler(uint64_t src, uint64_t dst)
@@ -109,6 +111,14 @@ void call_handler(uint64_t src, uint64_t dst)
     reg.rip = src;
 }
 
+void ret_handler(uint64_t src, uint64_t dst)
+{
+    // rsp += 8
+    uint64_t ret_addr = read64bits_dram(va2pa(reg.rsp));
+    reg.rsp += 8;
+    reg.rip = ret_addr;
+}
+
 void push_reg_handler(uint64_t src, uint64_t dst)
 {
     // src : reg
@@ -121,11 +131,11 @@ void push_reg_handler(uint64_t src, uint64_t dst)
 
 void pop_reg_handler(uint64_t src, uint64_t dst)
 {
-    // src : reg
+    // src : reg (rbp)
     // dst : empty
-    // rsp = rsp - 8
-    reg.rsp -= 0x8;
-
+    // rsp = rsp + 8
+    *(uint64_t *)src = read64bits_dram(va2pa(reg.rsp));
+    reg.rsp += 8;
     reg.rip = reg.rip + sizeof(inst_t);
 }
 
@@ -133,7 +143,14 @@ void mov_reg_mem_handler(uint64_t src, uint64_t dst)
 {
     // src : reg
     // dst : mem virtual address
-    write64bits_dram(va2pa(dst),*(uint64_t *)src);
+    write64bits_dram(va2pa(dst), *(uint64_t *)src);
+    reg.rip = reg.rip + sizeof(inst_t);
+}
 
+void mov_mem_reg_handler(uint64_t src, uint64_t dst)
+{
+    // src : mem virtual address
+    // dst : reg
+    *(uint64_t *)dst = read64bits_dram(va2pa(src));
     reg.rip = reg.rip + sizeof(inst_t);
 }

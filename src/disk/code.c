@@ -36,42 +36,49 @@ inst_t program[15] = {
         "mov    \%rsi,-0x20(\%rbp)"
     },
     {
+        // 7
         mov_mem_reg,
         {MM_IMM_REG, -0x18, 0, (uint64_t *)&reg.rbp, NULL},
         {REG, 0, 0, (uint64_t *)&reg.rdx, NULL},
         "mov    -0x18(\%rbp),\%rdx"
     },
     {
+        // 8
         mov_mem_reg,
         {MM_IMM_REG, -0x20, 0, (uint64_t *)&reg.rbp, NULL},
         {REG, 0, 0, (uint64_t *)&reg.rax, NULL},
         "mov    -0x20(\%rbp),\%rax"
     },
     {
+        // 9
         add_reg_reg,
         {REG, 0, 0, (uint64_t *)&reg.rdx, NULL},
         {REG, 0, 0, (uint64_t *)&reg.rax, NULL},
-        "add    \%rad,\%rax"
+        "add    \%rdx,\%rax"
     },
     {
+        // 10
         mov_reg_mem,
         {REG, 0, 0, (uint64_t *)&reg.rax, NULL},
         {MM_IMM_REG, -0x8, 0, (uint64_t *)&reg.rbp, NULL},
         "mov    \%rax,-0x8(\%rbp)"
     },
     {
+        // 11
         mov_mem_reg,
-        {REG, -0x8, 0, (uint64_t *)&reg.rbp, NULL},
+        {MM_IMM_REG, -0x8, 0, (uint64_t *)&reg.rbp, NULL},
         {REG, 0, 0 , (uint64_t *)&reg.rax, NULL},
         "mov    -0x8(\%rbp),\%rax"
     },
     {
+        // 12
         pop_reg, 
         {REG, 0, 0, (uint64_t *)&reg.rbp, NULL},
         {EMPTY, 0, 0, NULL, NULL},
         "pop     \%rbp"
     },
     {
+        // 13
         ret, 
         {EMPTY, 0, 0, NULL, NULL},
         {EMPTY, 0, 0, NULL, NULL},
@@ -100,6 +107,7 @@ inst_t program[15] = {
         "callq  <add>"
     },
     {
+        // 14
         mov_reg_mem,
         {REG, 0, 0, (uint64_t *)&reg.rax, NULL},
         {MM_IMM_REG, -0x8, 0, (uint64_t *)&reg.rbp, NULL},

@@ -46,9 +46,9 @@ int main()
 
     // run instruction
 
-    for (int i = 0; i < 7; ++i)
+    for (int i = 0; i < 8; ++i)
     {
-        printf("No.%x instruction\n", i);
+        printf("No.%d instruction\n", i);
         instruction_cycle();
 
         print_register();
