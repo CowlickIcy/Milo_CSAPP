@@ -1,7 +1,11 @@
-#include "mmu.h"
-#include "memory/dram.h"
+#include <stdlib.h>
+#include <assert.h>
+#include<headers/cpu.h>
+#include<headers/memory.h>
+#include<headers/common.h>
 
-uint64_t va2pa(uint64_t vaddr)
+
+uint64_t va2pa(uint64_t vaddr, core_t *cr)
 {
-    return vaddr % MM_LEM;
+    return vaddr % PHYSICAL_MEMORY_SPACE;
 }

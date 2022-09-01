@@ -82,7 +82,7 @@ int main()
     match = match && (read64bits_dram(va2pa(0x7ffffffee200)) == 0xabcd);
     match = match && (read64bits_dram(va2pa(0x7ffffffee1f8)) == 0x12340000);
     match = match && (read64bits_dram(va2pa(0x7ffffffee1f0)) == 0x8000660); // rsp
-
+    
     if (match == 1)
     {
         printf("memory match\n");
