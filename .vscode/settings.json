@@ -6,7 +6,8 @@
     "stdint.h": "c",
     "register.h": "c",
     "stdarg.h": "c",
-    "common.h": "c"
+    "common.h": "c",
+    "cpu.h": "c"
   },
   "[c]": {
     "editor.quickSuggestions": {
