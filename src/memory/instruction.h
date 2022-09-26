@@ -47,7 +47,6 @@ typedef struct INSTRUCT_STRUCT
 } inst_t;
 
 typedef void (*handler_t)(uint64_t, uint64_t);
-
 handler_t handler_table[NUM_INSTRTYPE];
 
 void init_handler_table();

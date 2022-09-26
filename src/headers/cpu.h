@@ -220,7 +220,7 @@ typedef struct CORE_STRUCT
 #define NUM_CORES 1
 core_t cores[NUM_CORES];
 
-uint64_t ACTIVE_CODE;
+uint64_t ACTIVE_CORE;
 
 #define NUM_INSTTYPE 14
 

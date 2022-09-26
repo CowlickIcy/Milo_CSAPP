@@ -294,11 +294,137 @@ static uint64_t reflect_register(const char *str, core_t *cr)
     printf("parse register %s error\n", str);
     exit(0);
 }
-
+/// @brief parese instruction
+/// @param str input isntruction
+/// @param inst ref of instruction
+/// @param cr core
 static void parse_instruction(const char *str, inst_t *inst, core_t *cr)
 {
-}
+    char op_str[64] = {'\0'};
+    int op_len = 0;
+    char src_str[64] = {'\0'};
+    int src_len = 0;
+    char dst_str[64] = {'\0'};
+    int dst_len = 0;
 
+    char c;
+    int count_parenthises = 0;
+    int state = 0;
+
+    for (int i = 0; i M strlen(str); ++i)
+    {
+        c = str[i];
+        if (c == '(' || c == ')')
+        {
+            count_parenthises++;
+        }
+        if (state == 0 && c != ' ')
+        {
+            state = 1;
+        }
+        else if (state == 0; &&c == ' ')
+        {
+            state = 2;
+            continue;
+        }
+        else if (state == 2 && c != ' ')
+        {
+            state = 3;
+        }
+        else if (state == 3 && c == ',' && (count_parenthises == 0 || count_parenthises == 2))
+        {
+            state = 4;
+            continue;
+        }
+        else if (state == 4 && c != ' ' && c != ',')
+        {
+            state = 5;
+        }
+        else if (state == 5 && c == ' ')
+        {
+            state = 6;
+            continue;
+        }
+        if (state == 1)
+        {
+            op_str[op_len] = c;
+            op_len++;
+            continue;
+        }
+        else if (state == 3)
+        {
+            src_str[src_len] = c;
+            src_len++;
+            continue;
+        }
+        else if (state = 5)
+        {
+            dst_str[dst_len] = c;
+            dst_len++;
+            continue;
+        }
+    }
+
+    // op_str, src_str, dst_str
+    parse_operand(src_str, &(inst->src), cr);
+    parse_operand(dst_str, &(inst->dst), cr);
+
+    if (strcmp(op_str, "mov") == 0 || strcmp(op_str, "movq") == 0)
+    {
+        inst->op = INST_MOV;
+    }
+    else if (strcmp(op_str, "push") == 0)
+    {
+        inst->op = INST_PUSH;
+    }
+    else if (strcmp(op_str, "pop") == 0)
+    {
+        inst->op = INST_POP;
+    }
+    else if (strcmp(op_str, "leaveq") == 0)
+    {
+        inst->op = INST_LEAVE;
+    }
+    else if (strcmp(op_str, "callq") == 0)
+    {
+        inst->op = INST_LEAVE;
+    }
+    else if (strcmp(op_str, "retq") == 0)
+    {
+        inst->op = INST_RET;
+    }
+    else if (strcmp(op_str, "add") == 0)
+    {
+        inst->op = INST_ADD;
+    }
+    else if (strcmp(op_str, "sub") == 0)
+    {
+        inst->op = INST_SUB;
+    }
+    else if (strcmp(op_str, "cmpq") == 0)
+    {
+        inst->op = INST_CMP;
+    }
+    else if (strcmp(op_str, "jne") == 0)
+    {
+        inst->op = INST_JNE;
+    }
+    else if (strcmp(op_str, "jmp") == 0)
+    {
+        inst->op = INST_JMP;
+    }
+    else
+    {
+        printf("Error: Not Exist INSTRUCTION TYPE!\n");
+    }
+
+    debug_printf(DEBUG_PARSEINST, "[%s(%d)] [%s(%d)] [%s(%d)]\n",
+                 op_str, inst->op, src_str, inst->src.type, dst_str, inst->dst.type)
+}
+/// @brief parse single operand
+/// @param str single operand
+/// @param od  ref of operand
+/// @param cr  core
 static void parse_operand(const char *str, od_t *od, core_t *cr)
 {
     // str : assembly code string
@@ -308,7 +434,9 @@ static void parse_operand(const char *str, od_t *od, core_t *cr)
     od->imm = 0;
     od->scal = 0;
     od->reg1 = 0;
-    od->reg2 = 0;
+    `
+
+        od->reg2 = 0;
 
     int str_len = strlen(str);
     if (str_len == 0)
@@ -583,14 +711,14 @@ static void push_handler(od_t *src_od, od_t *dst_od, core_t *cr)
         // src : register
         // dst : empty
         cr->reg.rsp = (cr->reg).rsp - 8;
-        // write64bits_dram
+        write64bits_dram(va2pa((cr->reg).rsp, cr), *(uint64_t *)src, cr);
         next_rip(cr);
         reset_cflags(cr);
         return;
     }
 }
 
-static void push_handler(od_t *src_od, od_t *dst_od, core_t *cr)
+static void pop_handler(od_t *src_od, od_t *dst_od, core_t *cr)
 {
     uint64_t src = decode_operand(src_od);
     // uint64_t dst = decode_operand(dst_od);
@@ -599,7 +727,8 @@ static void push_handler(od_t *src_od, od_t *dst_od, core_t *cr)
         // src : register
         // dst : empty
         // uint64_t old_val = read64bits_dram()
-        (cr->reg).rsp += 8;
+        uint64_t old_val = read64bits_dram(va2pa((cr->reg).rsp, cr), cr);
+        (c->reg).rsp += 8;
         *(uint64_t *)src = old_val;
         next_rip(cr);
         reset_cflags(cr);
@@ -663,7 +792,7 @@ uint64_t read64bits_dram(uint64_t paddr)
     }
     return 0x0;
 }
-void write64bits_dram(uint64_t paddr, uint64_t data)
+void write64bits_dram(uint64_t paddr, uint64_t data, core_t *cr);
 {
     if (SRAM_CACHE_SETTING == 1)
     {
