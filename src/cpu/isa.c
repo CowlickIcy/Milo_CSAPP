@@ -753,11 +753,38 @@ static void call_handler(od_t *src_od, od_t *dst_od, core_t *cr)
     // write64bits_dram()
 }
 
+static void sub_handler(od_t *src_od, od_t *dst_od, core_t *cr)
+{
+
+    uint64_t src = decode_operand(src_od);
+    uint64_t dst = decode_operand(dst_od);
+
+    if (src_od->type == IMM && dst_od->type == REG)
+    {
+        // src: immediately number
+        // dst: register
+        // dst = dst - src
+        uint64_t val = *(uint64_t)dst + (~src + 1);
+
+        // set condition flags
+        int val_sign = ((val>> 63) & 0x1);
+        int src_sign = ((src>> 63) & 0x1);
+        int dst_sign = ((dst>> 63) & 0x1);
+
+        cr->flags.CF = (val < *(uint64_t *)src);
+        cr->flags.ZF = (val == 0);
+        cr->flags.SF = ((val >> 63) && 0x1);
+        cr->flags.OF = (src_sign == 0 && dst_sign == 0 && val_sign == 1)
+                    || (src_sign == 1 && dst_sign == 1 && val_sign == 0);
+    }
+}
 /// @brief instruction cycle is implemented in CPU
 void instruction_cycle(core_t *cr)
 {
     // fetch: get the instruction string by program counter
-    const char *inst_str = (const char *)cr->rip;
+    char inst_str[MAX_INSTRUCTION_CHAR + 16];
+    readinst_dram(va2pa(cr->rip, cr), inst_str, cr);
+
     debug_printf(DEBUG_INSTRUCTIONCYCLE, "%lx    %s\n", cr->rip, inst_str);
 
     // decode: decode the run-time instruction operands

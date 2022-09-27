@@ -21,6 +21,9 @@
 // use sram chche for memory access
 #define DEBUG_ENABLE_SRAM_CACHE 0
 
+// commonly shared variables
+#define MAX_INSTRUCTION_CHAR 64
+
 // printf wrapper
 uint64_t debug_printf(uint64_t open_set. const char *format, ...);
 
