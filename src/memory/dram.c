@@ -63,7 +63,7 @@ void writeinst_dram(uint64_t paddr, const char *str, core_t *cr)
         }
         else
         {
-            pm[paddr + i] =
+            pm[paddr + i] = 0;
         }
     }
 }

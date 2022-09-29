@@ -738,8 +738,16 @@ static void pop_handler(od_t *src_od, od_t *dst_od, core_t *cr)
 
 static void leave_handler(od_t *src_od, od_t *dst_od, core_t *cr)
 {
-    uint64_t src = decode_operand(src_od);
-    // uint64_t dst = decode_operand(dst_od);
+    // mov %rsp, %rbp
+    (cr->reg).rsp = (cr->reg).rbp;
+
+    // popq %rbp
+    uint64_t old_val = read64bits_dram(va2pa((cr->reg).rsp, cr), cr);
+    (cr->reg).rsp += 8;
+    (cr->reg).rbp = old_val;
+    next_rip(cr);
+    reset_cflags(cr);
+    return;
 }
 
 static void call_handler(od_t *src_od, od_t *dst_od, core_t *cr)
@@ -750,9 +758,47 @@ static void call_handler(od_t *src_od, od_t *dst_od, core_t *cr)
     // src : immediate number(virtual address of target function starting)
     // dst : empty
     (cr->reg).rsp -= 8;
-    // write64bits_dram()
-}
+    write64bits_dram(va2pa((cr->reg).rsp, cr), cr->rip + sizeof(char) * MAX_INSTRUCTION_CHAR, cr);
 
+    // jump to target function address
+    cr->rip = src;
+    reset_cflags(cr);
+}
+static void ret_handler(od_t *src_od, od_t *dst_od, core_t *cr)
+{
+    uint64_t ret_addr = read64bits_dram(va2pa((cr->reg).rsp, cr), cr);
+    (cr->reg).rsp += 8;
+
+    // jump to return address
+    cr->rip = ret_addr;
+    reset_cflags(cr);
+    s
+}
+static void add_handler(od_t *src_od, od_t *dst_od, core_t *cr)
+{
+    uint64_t src = decode_operand(src_od);
+    uint64_t dst = decode_operand(dst_od);
+
+    if (src_od->type == REG && dst_od->type == REG)
+    {
+        // src: register
+        // dst: register
+        uint64_t val = *(uint64_t *)dst + *(uint64_t *)src;
+
+        int val_sign = ((val >> 63) & 0x1);
+        int src_sign = ((*(uint64_t *)src >> 63) & 0x1);
+        int dst_sign = ((*(uint64_t *)dst >> 63) & 0x1);
+
+        cr->flags.CF = (val < *(uint64_t *)src);
+        cr->flags.ZF = (val == 0);
+        cr->flags.SF = val_sign;
+        cr->flags.OF = (src_sign == 0 && dst_sign == 0 && val_sign == 1) || (src_sign == 1 && dst_sign == 1 && val_sign == 0);
+
+        *(uint64_t *)dst = val;
+        next_rip(cr);
+        return;
+    }
+}
 static void sub_handler(od_t *src_od, od_t *dst_od, core_t *cr)
 {
 
@@ -767,17 +813,72 @@ static void sub_handler(od_t *src_od, od_t *dst_od, core_t *cr)
         uint64_t val = *(uint64_t)dst + (~src + 1);
 
         // set condition flags
-        int val_sign = ((val>> 63) & 0x1);
-        int src_sign = ((src>> 63) & 0x1);
-        int dst_sign = ((dst>> 63) & 0x1);
+        int val_sign = ((val >> 63) & 0x1);
+        int src_sign = ((*(uint64_t *)src >> 63) & 0x1);
+        int dst_sign = ((*(uint64_t *)dst >> 63) & 0x1);
 
-        cr->flags.CF = (val < *(uint64_t *)src);
+        cr->flags.CF = (val > dval);
         cr->flags.ZF = (val == 0);
-        cr->flags.SF = ((val >> 63) && 0x1);
-        cr->flags.OF = (src_sign == 0 && dst_sign == 0 && val_sign == 1)
-                    || (src_sign == 1 && dst_sign == 1 && val_sign == 0);
+        cr->flags.SF = val_sign;
+        cr->flags.OF = (src_sign == 1 && dst_sign == 0 && val_sign == 1) || (src_sign == 0 && dst_sign == 1 && val_sign == 0);
+
+        next_rip(cr);
+        return;
     }
 }
+
+static void cmpq_handler(od_t *src_od, od_t *dst_od, core_t *cr)
+{
+    uint64_t src = decode_operand(src_od);
+    uint64_t dst = decode_operand(dst_od);
+
+    if (src_od->type == IMM && dst_od->type >= MEM_IMM)
+    {
+        // src: immediately number
+        // dst: memory immediately number
+        // dst = dst - src
+        uint64_t dval = read64bits_dram(va2pa(dst, cr), cr);
+        uint64_t val = dval + (~src + 1);
+
+        // set condition flags
+        int val_sign = ((val >> 63) & 0x1);
+        int src_sign = ((*(uint64_t *)src >> 63) & 0x1);
+        int dst_sign = (dval >> 63) & 0x1);
+
+        cr->flags.CF = (val > *(uint64_t *)dst);
+        cr->flags.ZF = (val == 0);
+        cr->flags.SF = val_sign;
+        cr->flags.OF = (src_sign == 1 && dst_sign == 0 && val_sign == 1) || (src_sign == 0 && dst_sign == 1 && val_sign == 0);
+
+        *(uint64_t *)dst = val;
+        next_rip(cr);
+        return;
+    }
+}
+
+static void jne_handler(od_t *src_od, od_t *dst_od, core_t *cr)
+{
+    uint64_t src = decode_operand(src_od);
+
+    if (cr->flags.ZF != 1)
+    {
+        // last instruction value != 0
+        cr->rip = src;
+    }
+    else
+    {
+        next_rip(cr);
+    }
+    reset_cflags(cr);
+}
+
+static void jmp_handler(od_t *src_od, od_t *dst_od, core_t *cr)
+{
+    uint64_t src = decode_operand(src_od);
+    cr->rip = src;
+    cr->flags.__cpu_flag_value = 0;
+}
+
 /// @brief instruction cycle is implemented in CPU
 void instruction_cycle(core_t *cr)
 {
