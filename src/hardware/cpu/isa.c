@@ -125,7 +125,7 @@ static uint64_t decode_od(od_t *od)
         {
             vaddr = od->imm + *((uint64_t *)od->reg1) + *((uint64_t *)od->reg2) * od->scal; // case 9
         }
-
+        
         return vaddr;
     }
     return 0;
@@ -772,7 +772,7 @@ static void ret_handler(od_t *src_od, od_t *dst_od, core_t *cr)
     // jump to return address
     cr->rip = ret_addr;
     reset_cflags(cr);
-    s
+    
 }
 static void add_handler(od_t *src_od, od_t *dst_od, core_t *cr)
 {
@@ -943,9 +943,9 @@ void print_register(core_t *cr);
 void print_register(core_t *cr)
 {
     printf("rax = %16lx\trbx = %16lx\trcx = %16lx\trdx = %16lx\n",
-           reg.rax, reg.rbx, reg.rcx, reg.rdx);
+           cpu_reg.rax, cpu_reg.rbx, cpu_reg.rcx, cpu_reg.rdx);
     printf("rsi = %16lx\trdi = %16lx\trbp = %16lx\trsp = %16lx\n",
-           reg.rsi, reg.rdi, reg.rbp, reg.rsp);
+           cpu_reg.rsi, cpu_reg.rdi, cpu_reg.rbp, cpu_reg.rsp);
     printf("rip = %16lx\n", reg.rip);
 
     printf("CF = %u\tZF = %u\tSF = %u\tOF = %u\t",
