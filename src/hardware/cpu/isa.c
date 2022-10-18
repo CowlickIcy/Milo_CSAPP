@@ -69,7 +69,7 @@ static uint64_t decode_operand(od_t *od);
 /// @brief interpret the operand
 /// @param od operand pointer
 /// @return uint64_t num
-static uint64_t decode_od(od_t *od)
+static uint64_t decode_operand(od_t *od)
 {
     if (od->type == IMM)
     {
@@ -125,7 +125,7 @@ static uint64_t decode_od(od_t *od)
         {
             vaddr = od->imm + *((uint64_t *)od->reg1) + *((uint64_t *)od->reg2) * od->scal; // case 9
         }
-        
+
         return vaddr;
     }
     return 0;
@@ -209,7 +209,7 @@ static const char *reg_name_list[72] = {
 
 static uint64_t reflect_register(const char *str, core_t *cr)
 {
-    reg_t *reg = &(cr->reg);
+    cpu_reg_t *reg = &(cr->reg);
     // map table
     uint64_t reg_addr[72] = {
         (uint64_t) & (reg->rax),
@@ -283,8 +283,8 @@ static uint64_t reflect_register(const char *str, core_t *cr)
         (uint64_t) & (reg->r15),
         (uint64_t) & (reg->e15d),
         (uint64_t) & (reg->r15w),
-        (uint64_t) & (reg->r15b)
-    } for (int i = 0; i < 72; ++i)
+        (uint64_t) & (reg->r15b)};
+    for (int i = 0; i < 72; ++i)
     {
         if (strcmp(stc, reg_name_list[i]) == 0)
         {
@@ -434,9 +434,7 @@ static void parse_operand(const char *str, od_t *od, core_t *cr)
     od->imm = 0;
     od->scal = 0;
     od->reg1 = 0;
-    `
-
-        od->reg2 = 0;
+    od->reg2 = 0;
 
     int str_len = strlen(str);
     if (str_len == 0)
@@ -772,7 +770,6 @@ static void ret_handler(od_t *src_od, od_t *dst_od, core_t *cr)
     // jump to return address
     cr->rip = ret_addr;
     reset_cflags(cr);
-    
 }
 static void add_handler(od_t *src_od, od_t *dst_od, core_t *cr)
 {

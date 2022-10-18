@@ -203,7 +203,6 @@ typedef struct CORE_STRUCT
 
     cpu_reg_t reg;
 } core_t;
-core_t core;
 
 #define NUM_CORES 1
 core_t cores[NUM_CORES];
