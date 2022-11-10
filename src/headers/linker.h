@@ -23,7 +23,7 @@ typedef enum E_ST_TYPE
 } st_type_t;
 
 // section header table entry
-typedef struct 
+typedef struct SHT_ENTRY
 {
     char sh_name[MAX_CHAR_SECTION_NAME];
     uint64_t sh_addr;
@@ -51,7 +51,14 @@ typedef struct ELF_STRUCT
     char buffer[MAX_ELF_FILE_LENGTH][MAX_ELF_FILE_WIDTH];
     uint64_t line_count;
 
+    uint64_t sht_count;
     sh_entry_t *sht;
+
+    uint64_t symtab_count;
+    st_entry_t *symtab;
 } elf_t;
+
+void parse_elf(char *filename, elf_t *elf);
+void free_elf(elf_t *elf);
 
 #endif

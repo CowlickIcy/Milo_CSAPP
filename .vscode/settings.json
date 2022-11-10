@@ -7,7 +7,9 @@
     "register.h": "c",
     "stdarg.h": "c",
     "common.h": "c",
-    "cpu.h": "c"
+    "cpu.h": "c",
+    "linker.h": "c",
+    "assert.h": "c"
   },
   "[c]": {
     "editor.quickSuggestions": {
