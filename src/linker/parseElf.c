@@ -7,8 +7,6 @@
 #include <headers/common.h>
 
 /// @brief read elf text file at gived buffer address
-/// @param filename
-/// @param bufaddr
 static int read_elf(const char *filename, uint64_t bufaddr)
 {
     FILE *fp;
@@ -80,8 +78,6 @@ static int read_elf(const char *filename, uint64_t bufaddr)
 }
 
 /// @brief only this function exposed to outside
-/// @param filename
-/// @param elf
 void parse_elf(char *filename, elf_t *elf)
 {
     assert(elf != NULL);
@@ -94,7 +90,7 @@ void parse_elf(char *filename, elf_t *elf)
     int sh_count = string2uint(elf->buffer[1]);
     elf->sht = malloc(sh_count * sizeof(sh_entry_t));
 
-    sh_entry_t *symtab_ptr = NULL;
+    sh_entry_t *symt_sh = NULL;
     for (int i = 0; i < sh_count; ++i)
     {
         parse_sh(elf->buffer[i], &(elf->sht[i]));
@@ -102,13 +98,22 @@ void parse_elf(char *filename, elf_t *elf)
 
         if (strcmp(elf->sht[i].sh_name, ".symtab") == 0)
         {
-            symtab_ptr = &(elf->sht[i]);
+            symt_sh = &(elf->sht[i]);
         }
     }
 
-    assert(symtab_ptr != NULL);
-    
+    assert(symt_sh != NULL);
+
     // parse symtab 
+    elf->symtab_count = symt_sh->sh_size;
+    elf->symtab = malloc(elf->symtab_count * sizeof(st_entry_t));
+    for(int i = 0; i < symt_sh->sh_size; ++i)
+    {
+        parse_symtab(
+            elf->buffer[i + symt_sh->sh_offset],
+            &(elf->symtab[i]));
+        // print_symtab_entry();
+    }
 }
 
 void free_elf(elf_t *elf)
@@ -117,6 +122,7 @@ void free_elf(elf_t *elf)
 
     free(elf->sht);
 }
+
 /// @brief parse section header tabel
 static void parse_sh(char *str, sh_entry_t *sh)
 {
@@ -134,14 +140,14 @@ static void parse_sh(char *str, sh_entry_t *sh)
 }
 
 static void parse_symtab(char *str, st_entry_t *ste)
-/// @brief parse symbal tabel
+/// @brief parse symbol tabel
 {
     char **cols;
     int num_cols = parse_table_entry(str, &cols);
     assert(num_cols == 6);
     assert(ste != NULL);
 
-    // symbal bind check
+    // symbol bind check
     if (strcmp(cols[1]), "STB_LOCAL" == 0)
     {
         ste->bind = STB_LOCAL;
@@ -156,11 +162,11 @@ static void parse_symtab(char *str, st_entry_t *ste)
     }
     else
     {
-        print("Symbal bind is unauthorized.\n");
+        print("symbol bind is unauthorized.\n");
         exit(0);
     }
 
-    // symbal type check
+    // symbol type check
     if (strcmp(cols[2]), "STT_NOTYPE" == 0)
     {
         ste->type = STT_NOTYPE;
@@ -175,7 +181,7 @@ static void parse_symtab(char *str, st_entry_t *ste)
     }
     else
     {
-        print("Symbal type is unauthorized.\n");
+        print("symbol type is unauthorized.\n");
         exit(0);
     }
 

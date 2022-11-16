@@ -5,7 +5,7 @@
 #include <stdlib.h>
 
 #define MAX_CHAR_SECTION_NAME (32)
-#define MAX_CHAR_SYMBAl_NAME (64)
+#define MAX_CHAR_SYMBOL_NAME (64)
 
 
 typedef enum E_ST_BIND
@@ -31,10 +31,10 @@ typedef struct SHT_ENTRY
     uint64_t sh_size;
 } sh_entry_t;
 
-// symbal table
+// symbol table
 typedef struct 
 {
-    char st_name[MAX_CHAR_SYMBAl_NAME];
+    char st_name[MAX_CHAR_SYMBOL_NAME];
     st_bind_t bind;
     st_type_t type;
     char st_shndx[MAX_CHAR_SECTION_NAME];
@@ -61,4 +61,5 @@ typedef struct ELF_STRUCT
 void parse_elf(char *filename, elf_t *elf);
 void free_elf(elf_t *elf);
 
+void link_elf(elf_t **srcs, int num_srcs, elf_t *dst);
 #endif
